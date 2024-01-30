@@ -28,7 +28,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         // Set custom LoginViewController as root
         
-        let navigationController = UINavigationController(rootViewController: MainVC())
+        let navigationController = UINavigationController(rootViewController: SplashVC())
+            navigationController.navigationBar.isHidden = true
+            self.window?.rootViewController = navigationController
+        
+//        let navigationController = UINavigationController(rootViewController: MainVC())
         //              navigationController.navigationBar.isHidden = false
         self.window?.rootViewController = navigationController
         //window?.rootViewController = SplashScreenVC()

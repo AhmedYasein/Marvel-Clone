@@ -6,74 +6,95 @@
 //
 
 import UIKit
+import RxSwift
+import RxCocoa
 
 class MainVC: UIViewController {
     
-    private let images: [UIImage] = [
-        
-        UIImage(named: "icn-nav-marvel")!,
-        UIImage(named: "marvel-logo-2D20B064BD-seeklogo.com")!
+    var mainViewModel: MainViewModel?
     
+    // Creating TableView
     
-    ]
-
-    private let mainTableView: UITableView = {
-        
+     let mainTableView: UITableView = {
         let tableView = UITableView()
-        tableView.backgroundColor = .gray
         tableView.allowsSelection = true
         tableView.register(MainTableViewCell.self, forCellReuseIdentifier: MainTableViewCell.identifier)
+        //        tableView.isHidden = true
         return tableView
     }()
+    
+    
+    // ViewDidLoad
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        mainViewModel = MainViewModel(mainVC: self)
+        mainViewModel!.getCharacters()
         self.mainTableView.delegate = self
-        self.mainTableView.dataSource = self
-        setupUI()
+        setupTableViewConstraints()
         setLogo()
-     
-        // Do any additional setup after loading the view.
+        showLoader()
+        self.mainViewModel!.bindTableView()
+        
     }
+    
+  
+    private func showLoader() {
+        
+        self.view.showLoading()
+    }
+    
+    private func hideLoader() {
+        
+        self.view.hideLoading()
+    }
+    
+    
+    // Reloading Data in TableView
+    
+    func reloadTableViewData(){
+        self.mainTableView.reloadData()
+        hideLoader()
+    }
+    
+   // Setting Logo for NavBar
+    
     private func setLogo(){
         let logo = UIImage(named: "icn-nav-marvel")
         let imageView = UIImageView(image: logo)
         self.navigationItem.titleView = imageView
     }
     
-    private func setupUI() {
+    // Setting TableView Constraints
+    
+    private func setupTableViewConstraints() {
         self.view.addSubview(mainTableView)
         mainTableView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             mainTableView.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor), mainTableView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor), mainTableView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor), mainTableView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor)
-                                    ])
+        ])
     }
-
-
+    
 
 
 }
 
+// Confirm TableView Delegate
 
-extension MainVC : UITableViewDelegate, UITableViewDataSource {
+extension MainVC : UITableViewDelegate {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return self.images.count
+        return mainViewModel?.getCharactersCount() ?? 0
     }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: MainTableViewCell.identifier, for: indexPath) as? MainTableViewCell else
-        {
-            return UITableViewCell()
-        }
-        let image = images[indexPath.row]
-        cell.configure(image: image, name: indexPath.row.description)
-        return cell
-    }
-    
+
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 122.2
+        return 151
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        print("row", indexPath.row)
+        
+        self.navigationController?.pushViewController(HeroDetailsVC(), animated: true)
     }
+    
+  
 }
+
